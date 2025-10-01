@@ -1,0 +1,717 @@
+﻿@model List<FoodMenu.POCOModels.Menucategory>
+@{
+    Layout = null;
+    ViewBag.Title = "Menu";
+    var tableCode = ViewBag.TableCode as string ?? "";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Menu</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <style>
+        :root {
+            --accent: #e9b870;
+            --dark: #674d3c;
+            --shadow-sm: 0 1px 4px #0002;
+            --radius: 16px;
+            --header-height: 86px;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #faf8f7;
+            color: #232323;
+            min-width: 350px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #fff;
+            box-shadow: 0 2px 4px #0001;
+            padding: 18px 0 12px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            min-height: var(--header-height);
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 2px solid var(--dark);
+            background: #eee;
+            display: block;
+            margin: 0 auto 3px auto;
+        }
+
+        .rest-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--dark);
+        }
+
+        .menu-toggle {
+            position: absolute;
+            left: 18px;
+            top: 20px;
+            width: 36px;
+            height: 36px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 120;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+            .menu-toggle span {
+                width: 28px;
+                height: 4px;
+                margin: 2.5px 0;
+                background: #a57b4c;
+                border-radius: 3px;
+                display: block;
+                transition: all 0.24s;
+            }
+
+        @@media (min-width: 650px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0004;
+            z-index: 105;
+            display: none;
+        }
+
+            .overlay.show {
+                display: block;
+            }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 220px;
+            background: #fff;
+            box-shadow: 2px 0 18px #0002;
+            z-index: 110;
+            padding-top: 88px;
+            padding-bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transition: transform 0.2s;
+            transform: translateX(-100%);
+            overscroll-behavior: contain;
+        }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar nav button {
+                display: block;
+                width: 85%;
+                margin: 7px auto;
+                background: none;
+                border: none;
+                font: inherit;
+                padding: 13px 0;
+                border-radius: 12px;
+                color: var(--dark);
+                font-size: 1rem;
+                border-bottom: 2px solid transparent;
+                text-align: left;
+                padding-left: 14px;
+                transition: 0.16s;
+            }
+
+                .sidebar nav button.active, .sidebar nav button:hover {
+                    background: #f8f5ef;
+                    color: #333;
+                    border-bottom: 2.5px solid var(--accent);
+                    font-weight: 600;
+                }
+
+            .sidebar .close-btn {
+                position: absolute;
+                right: 14px;
+                top: 20px;
+                font-size: 1.9rem;
+                border: none;
+                background: none;
+                color: var(--accent);
+                cursor: pointer;
+            }
+
+        @@media (min-width: 650px) {
+            .sidebar {
+                position: sticky;
+                top: calc(var(--header-height) + 2px);
+                left: 0;
+                width: 180px;
+                min-height: 400px;
+                background: #f9f8f5;
+                box-shadow: none;
+                padding-top: 22px;
+                padding-bottom: 0;
+                transform: none !important;
+                flex-shrink: 0;
+                border-radius: var(--radius);
+                margin: 24px 10px 0 18px;
+            }
+
+                .sidebar .close-btn, .overlay {
+                    display: none !important;
+                }
+        }
+
+        .menu-main {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0;
+        }
+
+        @@media (max-width:649px) {
+            .menu-main {
+                flex-direction: column;
+            }
+        }
+
+        #menuSections {
+            flex: 1 1 380px;
+            min-width: 0;
+            padding: 15px 10px 120px 10px;
+        }
+
+        @@media (min-width: 650px) {
+            #menuSections {
+                padding: 16px 28px 120px 18px;
+            }
+        }
+
+        .section {
+            padding: 12px 0 8px 0;
+            margin-bottom: 6px;
+            scroll-margin-top: calc(var(--header-height) + 12px);
+        }
+
+        .section-title {
+            font-size: 1.13rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin: 20px 0 12px 0;
+        }
+
+        .menu-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @@media (min-width: 700px) {
+            .menu-list {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @@media (min-width: 950px) {
+            .menu-list {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        .menu-item {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            gap: 13px;
+            min-height: 82px;
+            transition: box-shadow 0.16s;
+        }
+
+            .menu-item:hover {
+                box-shadow: 0 4px 12px #0002;
+            }
+
+        .item-photo {
+            width: 62px;
+            height: 62px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1.5px solid var(--accent);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 500;
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .item-price {
+            font-size: 1rem;
+            color: #a57b4c;
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: #f8f5ef;
+            border-radius: 13px;
+            padding: 3px 7px;
+        }
+
+        .qty-btn {
+            width: 22px;
+            height: 22px;
+            border: none;
+            border-radius: 4px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.13s;
+        }
+
+            .qty-btn:active {
+                background: #d49d41;
+            }
+
+        .qty-number {
+            font-size: 1rem;
+            min-width: 18px;
+            text-align: center;
+            font-weight: 500;
+            color: #333;
+        }
+
+        #orderBar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100vw;
+            max-width: 1000px;
+            background: #fff;
+            box-shadow: 0 -2px 6px #0001;
+            padding: 15px 18px;
+            text-align: center;
+            z-index: 100;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .order-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin: 0 20px;
+        }
+
+        #viewCartBtn {
+            padding: 13px 20px;
+            background: #f8f5ef;
+            color: var(--dark);
+            font-size: 1.09rem;
+            font-weight: 600;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+                    #viewCartBtn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+
+
+
+
+
+
+        #orderBtn {
+            padding: 13px 20px;
+            background: linear-gradient(90deg,#e9b870,#674d3c);
+            color: #fff;
+            font-size: 1.09rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px #0002;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+            #orderBtn:active {
+                box-shadow: none;
+            }
+
+        #cartCount {
+            margin-left: 11px;
+            background: #fff;
+            color: var(--dark);
+            border-radius: 15px;
+            padding: 2.5px 9px;
+            font-size: 1rem;
+            font-weight: 500;
+            border: 1.5px solid var(--accent);
+            vertical-align: middle;
+        }
+
+        #orderTotal {
+            color: #84602b;
+            font-weight: bold;
+            font-size: 1rem;
+            margin: 0 10px;
+        }
+
+        /* Cart Modal Styles */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .cart-modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .cart-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .cart-modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .cart-close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .cart-close:hover {
+            color: var(--dark);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-name {
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .cart-item-details {
+            text-align: right;
+            color: #666;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid var(--accent);
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: right;
+            color: var(--dark);
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="menu-toggle" id="menuToggleBtn" aria-label="Open categories menu">
+                <span></span><span></span><span></span>
+            </button>
+            <img class="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcPW2ezsWOoDquonGD_xUNlz6kJ0tzHBdXgQ&s" alt="Restaurant Logo">
+            <div class="rest-name">MA Elegance</div>
+        </header>
+        <div class="overlay" id="sidebarOverlay"></div>
+        <div class="menu-main">
+            <nav class="sidebar" id="sidebarNav">
+                <button class="close-btn" id="closeSidebarBtn" title="Close categories">&times;</button>
+                <nav>
+                    @for (var i = 0; i < Model.Count; i++)
+                    {
+                        var cat = Model[i];
+                        <button class="nav-btn @(i==0?"active":"")" data-section="cat_@cat.CategoryId">@cat.CategoryName</button>
+                    }
+                </nav>
+            </nav>
+                         <form id="menuForm" method="post" action="/Menu/PlaceOrder">
+                <input type="hidden" name="TableCode" value="@tableCode" />
+                                 <div id="menuSections">
+                     @{
+                         int itemIndex = 0;
+                     }
+                     @for (var ci = 0; ci < Model.Count; ci++)
+                     {
+                         var cat = Model[ci];
+                         <div class="section" id="cat_@cat.CategoryId">
+                             <div class="section-title">@cat.CategoryName</div>
+                             <div class="menu-list">
+                                 @foreach (var item in cat.Menuitems.Where(m => m.IsActive ?? true))
+                                 {
+                                     <div class="menu-item" data-itemid="@item.MenuItemId" data-price="@item.Price" data-name="@item.Name" data-index="@itemIndex">
+                                         <img class="item-photo" src="@item.ImageUrl" alt="@item.Name" />
+                                         <div class="item-info">
+                                             <div class="item-name">@item.Name</div>
+                                             <div class="item-price">₹@item.Price</div>
+                                         </div>
+                                         <div class="qty-control">
+                                             <button type="button" class="qty-btn minus">–</button>
+                                             <span class="qty-number">0</span>
+                                             <button type="button" class="qty-btn plus">+</button>
+                                         </div>
+                                         <input type="hidden" name="Items[@itemIndex].MenuItemId" value="@item.MenuItemId" />
+                                         <input type="hidden" name="Items[@itemIndex].Quantity" value="0" />
+                                     </div>
+                                     itemIndex++;
+                                 }
+                             </div>
+                         </div>
+                     }
+                </div>
+                <div id="orderBar">
+                    <span>Total: ₹<span id="orderTotal">0</span></span>
+                                         <div class="order-buttons">
+                         <button type="button" id="viewCartBtn">View Cart</button>
+                         <button type="submit" id="orderBtn">Place Order <span id="cartCount">0</span> items</button>
+                     </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="cart-modal">
+        <div class="cart-modal-content">
+            <div class="cart-modal-header">
+                <span class="cart-modal-title">Your Cart</span>
+                <span class="cart-close" id="cartCloseBtn">&times;</span>
+            </div>
+            <div id="cartItems">
+                <div class="empty-cart">No items in cart</div>
+            </div>
+            <div class="cart-total">
+                Total: ₹<span id="cartModalTotal">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Sidebar controls ---
+        function closeSidebar() {
+            document.getElementById('sidebarNav').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        function openSidebar() {
+            document.getElementById('sidebarNav').classList.add('open');
+            document.getElementById('sidebarOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        document.getElementById('menuToggleBtn').onclick = openSidebar;
+        document.getElementById('closeSidebarBtn').onclick = closeSidebar;
+        document.getElementById('sidebarOverlay').onclick = closeSidebar;
+        window.addEventListener('resize', function () {
+            if (window.innerWidth >= 650)
+                closeSidebar();
+        });
+        // Sidebar navigation
+        document.querySelectorAll('.nav-btn').forEach(function (btn, idx, btns) {
+            btn.onclick = function () {
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                var sec = document.getElementById(btn.dataset.section);
+                if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                closeSidebar();
+            }
+        }); 
+        // Cart logic
+        let qty = {};
+        let total = 0;
+        let cartItems = {};
+        
+        document.getElementById('menuSections').addEventListener('click', function (e) {
+            var btn = e.target.closest('.qty-btn');
+            if (!btn) return;
+            var card = btn.closest('.menu-item');
+            var itemId = card.dataset.itemid;
+            var price = parseFloat(card.dataset.price);
+            var name = card.dataset.name;
+            
+            qty[itemId] = qty[itemId] || 0;
+            if (btn.classList.contains('plus')) qty[itemId]++;
+            else if (qty[itemId] > 0) qty[itemId]--;
+            
+                         card.querySelector('.qty-number').innerText = qty[itemId];
+             var index = card.dataset.index;
+             card.querySelector('input[name="Items[' + index + '].Quantity"]').value = qty[itemId];
+            
+            // Update cart items object
+            if (qty[itemId] > 0) {
+                cartItems[itemId] = { name: name, price: price, quantity: qty[itemId] };
+            } else {
+                delete cartItems[itemId];
+            }
+            
+            updateCart();
+        });
+        
+        function updateCart() {
+            let cnt = 0, sum = 0;
+            document.querySelectorAll('.menu-item').forEach(function (card) {
+                var id = card.dataset.itemid;
+                var price = parseFloat(card.dataset.price);
+                var q = qty[id] || 0;
+                cnt += q;
+                sum += q * price;
+            });
+            document.getElementById('cartCount').innerText = cnt;
+            document.getElementById('orderTotal').innerText = sum;
+            total = sum;
+        }
+        
+        
+        
+
+        
+        
+
+         // Cart Modal
+         document.getElementById('viewCartBtn').onclick = function() {
+             showCartModal();
+         };
+        
+        document.getElementById('cartCloseBtn').onclick = function() {
+            document.getElementById('cartModal').style.display = 'none';
+        };
+        
+        window.onclick = function(event) {
+            var modal = document.getElementById('cartModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+        
+        function showCartModal() {
+            var cartItemsContainer = document.getElementById('cartItems');
+            var cartModalTotal = document.getElementById('cartModalTotal');
+            
+            if (Object.keys(cartItems).length === 0) {
+                cartItemsContainer.innerHTML = '<div class="empty-cart">No items in cart</div>';
+                cartModalTotal.innerText = '0';
+            } else {
+                var html = '';
+                var total = 0;
+                
+                for (var itemId in cartItems) {
+                    var item = cartItems[itemId];
+                    var itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    
+                    html += `
+                        <div class="cart-item">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-details">
+                                ${item.quantity} x ₹${item.price} = ₹${itemTotal}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                cartItemsContainer.innerHTML = html;
+                cartModalTotal.innerText = total;
+            }
+            
+            document.getElementById('cartModal').style.display = 'block';
+        }
+        
+        // Prevent submit if cart empty
+        document.getElementById('menuForm').onsubmit = function () {
+            let c = 0; for (let k in qty) c += qty[k];
+            if (c === 0) {
+                alert("No items selected.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

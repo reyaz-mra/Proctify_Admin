@@ -1,0 +1,813 @@
+@model List<FoodMenu.POCOModels.Table>
+@{
+    ViewBag.Title = "Manage Tables";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Tables</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+    @* <script>
+        // Ensure QRCode is available
+        window.addEventListener('load', function() {
+            if (typeof QRCode === 'undefined') {
+                console.error('QRCode library not loaded');
+                // Fallback: load from alternative CDN
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+                script.onload = function() {
+                    console.log('QRCode library loaded from fallback CDN');
+                };
+                script.onerror = function() {
+                    console.error('Failed to load QRCode library');
+                };
+                document.head.appendChild(script);
+            }
+        });
+    </script> *@
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FFFDF6;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: #FAF6E9;
+            border-right: 2px solid #DDEB9D;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo-section {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #DDEB9D;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 2em;
+            font-weight: 700;
+            color: #A0C878;
+            margin-bottom: 10px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #DDEB9D;
+            color: #333;
+            text-decoration: none;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: #A0C878;
+            color: white;
+            box-shadow: 0 4px 15px rgba(160, 200, 120, 0.3);
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 1.2em;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            background: #FFFDF6;
+        }
+
+        .page-header {
+            background: #FAF6E9;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #DDEB9D;
+        }
+
+        .page-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .page-subtitle {
+            color: #666;
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+
+        .content-section {
+            background: #FAF6E9;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: 2px solid #DDEB9D;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: "➕";
+            font-size: 1.2em;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #DDEB9D;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #DDEB9D;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #A0C878;
+            box-shadow: 0 0 0 3px rgba(160, 200, 120, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #A0C878;
+            color: white;
+            box-shadow: 0 4px 15px rgba(160, 200, 120, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(160, 200, 120, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        /* Tables Grid */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #DDEB9D;
+            transition: all 0.3s ease;
+        }
+
+        .table-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-number {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .table-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #DDEB9D;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .table-info {
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .qr-section {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #DDEB9D;
+        }
+
+        .qr-code {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 15px;
+            border: 2px solid #DDEB9D;
+        }
+
+        .qr-link {
+            font-size: 0.9em;
+            color: #666;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #DDEB9D;
+            color: #155724;
+            border: 1px solid #A0C878;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state::before {
+            content: "🪑";
+            font-size: 3em;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @@keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: #A0C878;
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .close-modal {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.8em;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .qr-modal-code {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 20px 0;
+            border: 2px solid #DDEB9D;
+        }
+
+        .qr-modal-link {
+            font-size: 0.9em;
+            color: #666;
+            word-break: break-all;
+            margin-top: 15px;
+            padding: 10px;
+            background: #FAF6E9;
+            border-radius: 5px;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .add-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .form-group {
+                min-width: auto;
+            }
+            
+            .tables-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #A0C878;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.2em;
+        }
+
+        @@media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo-section">
+                <div class="logo">🍽️ FoodMenu</div>
+                <div class="logo-subtitle">Restaurant Management</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="/Admin/Dashboard" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Orders" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        Live Orders
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Analytics" class="nav-link">
+                        <span class="nav-icon">📈</span>
+                        Sales Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Categories" class="nav-link">
+                        <span class="nav-icon">📂</span>
+                        Categories
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/MenuItems" class="nav-link">
+                        <span class="nav-icon">🍕</span>
+                        Menu Items
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Tables" class="nav-link active">
+                        <span class="nav-icon">🪑</span>
+                        Tables
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Settings" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">🪑 Manage Tables</h1>
+                <p class="page-subtitle">Create tables and generate QR codes for menu access</p>
+            </div>
+
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Message"]
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="content-section">
+                <h2 class="section-title">Add New Table</h2>
+                <form method="post" action="/Admin/AddTable" class="add-form">
+                    <div class="form-group">
+                        <label for="tableCode" class="form-label">Table Code</label>
+                        <input type="text" id="tableCode" name="tableCode" class="form-input" 
+                               placeholder="e.g., T1, T2, VIP1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tableCapacity" class="form-label">Capacity</label>
+                        <input type="number" id="tableCapacity" name="tableCapacity" class="form-input" 
+                               placeholder="Number of seats" min="1" max="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tableLocation" class="form-label">Location</label>
+                        <input type="text" id="tableLocation" name="tableLocation" class="form-input" 
+                               placeholder="e.g., Indoor, Outdoor, VIP" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Table</button>
+                </form>
+            </div>
+
+            <div class="content-section">
+                <h2 class="section-title">Existing Tables</h2>
+                @if (!Model.Any())
+                {
+                    <div class="empty-state">
+                        <div>No tables found</div>
+                        <div style="font-size: 0.9em; margin-top: 10px; opacity: 0.7;">
+                            Add your first table above
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="tables-grid">
+                        @foreach (var table in Model)
+                        {
+                            <div class="table-card">
+                                <div class="table-header">
+                                    <div class="table-number">Table @table.TableCode</div>
+                                    <span class="table-status @(table.IsActive == true ? "status-active" : "status-inactive")">
+                                        @(table.IsActive == true ? "Active" : "Inactive")
+                                    </span>
+                                </div>
+                                
+                                <div class="table-info">
+                                    <div class="info-row">
+                                        <span class="info-label">Table ID:</span>
+                                        <span class="info-value">@table.TableId</span>
+                                    </div>
+                                    @* <div class="info-row">
+                                        <span class="info-label">Capacity:</span>
+                                        <span class="info-value">@table.Capacity seats</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Location:</span>
+                                        <span class="info-value">@table.Location</span>
+                                    </div> *@
+                                </div>
+
+                                <div class="table-actions">
+                                    <button class="btn btn-success qr-generator"
+                                            data-table-id="@table.TableId"
+                                            data-table-code="@table.TableCode">
+                                        📱 Generate QR
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="editTable(@table.TableId)">
+                                        ✏️ Edit
+                                    </button>
+                                </div>
+
+                                <div class="qr-section" id="qr-section-@table.TableId" style="display: none;">
+                                    <div class="qr-code" id="qr-code-@table.TableId"></div>
+                                    <div class="qr-link" id="qr-link-@table.TableId"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal" id="qrModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">QR Code for Table</h3>
+                <button type="button" class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="qr-modal-code" id="qrModalCode"></div>
+                <div class="qr-modal-link" id="qrModalLink"></div>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="downloadQR()">📥 Download QR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script> <!-- QR Code Library -->
+
+    <script>
+        $(function () {
+            $('.qr-generator').click(function () {
+                const tableId = $(this).data('table-id');
+                const tableCode = $(this).data('table-code');
+                const baseUrl = window.location.origin;
+                const qrUrl = `${baseUrl}/menu/${tableCode}`;
+
+                // Clear previous QR
+                $('#qrModalCode').empty();
+
+                // Generate QR Code
+                const qr = new QRCode(document.getElementById("qrModalCode"), {
+                    text: qrUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // Add label in center (simple overlay)
+                const label = document.createElement('div');
+                label.innerText = `Table ${tableId}`;
+                label.style.position = 'absolute';
+                label.style.top = '50%';
+                label.style.left = '50%';
+                label.style.transform = 'translate(-50%, -50%)';
+                label.style.background = 'white';
+                label.style.padding = '2px 6px';
+                label.style.fontSize = '14px';
+                label.style.borderRadius = '4px';
+                label.style.zIndex = '10';
+
+                const qrContainer = document.getElementById("qrModalCode");
+                qrContainer.style.position = 'relative';
+                qrContainer.appendChild(label);
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+                modal.show();
+
+                // Store for download
+                setTimeout(() => {
+                    const canvas = qrContainer.querySelector('canvas');
+                    if (canvas) {
+                        const qrDataUrl = canvas.toDataURL("image/png");
+                        $('#qrModalLink').html(`<a href="${qrDataUrl}" download="Table${tableId}_QRCode.png">Download Link</a>`);
+                        $('#qrModalLink').data('qr-src', qrDataUrl);
+                    }
+                }, 500);
+            });
+
+                
+        });
+
+        function downloadQR() {
+            debugger;
+            const canvas = document.querySelector('#qrModalCode canvas');
+            const tableId = document.getElementById('qrModal').getAttribute('data-table-id');
+
+            if (!canvas) {
+                alert("QR code not found. Please try again.");
+                return;
+            }
+
+            const image = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.href = image;
+            link.download = `Table${tableId}_QRCode.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        function closeModal() {
+            const modalElement = document.getElementById('qrModal');
+
+            // Forcefully reinitialize and hide the modal
+            const modalInstance = new bootstrap.Modal(modalElement);
+            modalInstance.hide();
+
+            // Also remove the 'show' class and backdrop manually (in case Bootstrap fails to clean up)
+            modalElement.classList.remove('show');
+            modalElement.setAttribute('aria-hidden', 'true');
+            modalElement.style.display = 'none';
+
+            
+            
+        }
+
+
+    </script>
+
+</body>
+</html> 

@@ -1,0 +1,519 @@
+@{
+    ViewBag.Title = "Sales Analytics";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sales Analytics</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FFFDF6;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: #FAF6E9;
+            border-right: 2px solid #DDEB9D;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo-section {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #DDEB9D;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 2em;
+            font-weight: 700;
+            color: #A0C878;
+            margin-bottom: 10px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #DDEB9D;
+            color: #333;
+            text-decoration: none;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: #A0C878;
+            color: white;
+            box-shadow: 0 4px 15px rgba(160, 200, 120, 0.3);
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 1.2em;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            background: #FFFDF6;
+        }
+
+        .page-header {
+            background: #FAF6E9;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #DDEB9D;
+        }
+
+        .page-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .page-subtitle {
+            color: #666;
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+
+        /* Analytics Section */
+        .analytics-section {
+            background: #FAF6E9;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #DDEB9D;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: "📈";
+            font-size: 1.2em;
+        }
+
+        .history-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #DDEB9D;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+
+        .form-label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input {
+            padding: 10px 15px;
+            border: 2px solid #DDEB9D;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #A0C878;
+            box-shadow: 0 0 0 3px rgba(160, 200, 120, 0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #A0C878;
+            color: white;
+            box-shadow: 0 4px 15px rgba(160, 200, 120, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(160, 200, 120, 0.4);
+        }
+
+        /* History Results */
+        .history-results {
+            margin-top: 20px;
+        }
+
+        .history-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 2px solid #DDEB9D;
+        }
+
+        .history-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .history-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .history-stat {
+            text-align: center;
+            padding: 15px;
+            background: #FAF6E9;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #DDEB9D;
+        }
+
+        .history-stat-number {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #A0C878;
+        }
+
+        .history-stat-label {
+            font-size: 0.8em;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .no-data::before {
+            content: "📊";
+            font-size: 3em;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #A0C878;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .history-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .history-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #A0C878;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.2em;
+        }
+
+        @@media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo-section">
+                <div class="logo">🍽️ FoodMenu</div>
+                <div class="logo-subtitle">Restaurant Management</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="/Admin/Dashboard" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Orders" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        Live Orders
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Analytics" class="nav-link active">
+                        <span class="nav-icon">📈</span>
+                        Sales Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Categories" class="nav-link">
+                        <span class="nav-icon">📂</span>
+                        Categories
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/MenuItems" class="nav-link">
+                        <span class="nav-icon">🍕</span>
+                        Menu Items
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Tables" class="nav-link">
+                        <span class="nav-icon">🪑</span>
+                        Tables
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Settings" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">📈 Sales Analytics</h1>
+                <p class="page-subtitle">Generate detailed sales reports and insights</p>
+            </div>
+
+            <!-- Analytics Section -->
+            <div class="analytics-section">
+                <h2 class="section-title">Sales History & Analytics</h2>
+                <form id="historyForm" class="history-form">
+                    <div class="form-group">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" id="startDate" name="startDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" id="endDate" name="endDate" class="form-input" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">📊 Generate Report</button>
+                </form>
+                <div id="historyResults" class="history-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // Set default dates for history form
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            document.getElementById('startDate').value = lastWeek.toISOString().split('T')[0];
+        });
+
+        // History form submission
+        document.getElementById('historyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            fetchHistoryData(startDate, endDate);
+        });
+
+        function fetchHistoryData(startDate, endDate) {
+            const resultsDiv = document.getElementById('historyResults');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><div>Generating report...</div></div>';
+
+            fetch(`/Admin/GetHistoryData?startDate=${startDate}&endDate=${endDate}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        resultsDiv.innerHTML = `<div class="no-data">${data.error}</div>`;
+                        return;
+                    }
+
+                    let html = `
+                        <div class="history-card">
+                            <div class="history-title">📊 Sales Report (${startDate} to ${endDate})</div>
+                            <div class="history-stats">
+                                <div class="history-stat">
+                                    <div class="history-stat-number">${data.totalOrders}</div>
+                                    <div class="history-stat-label">Total Orders</div>
+                                </div>
+                                <div class="history-stat">
+                                    <div class="history-stat-number">₹${data.totalRevenue}</div>
+                                    <div class="history-stat-label">Total Revenue</div>
+                                </div>
+                                <div class="history-stat">
+                                    <div class="history-stat-number">₹${data.averageOrderValue}</div>
+                                    <div class="history-stat-label">Avg Order Value</div>
+                                </div>
+                                <div class="history-stat">
+                                    <div class="history-stat-number">${data.mostSoldItem}</div>
+                                    <div class="history-stat-label">Most Sold Item</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (data.topItems && data.topItems.length > 0) {
+                        html += `
+                            <div class="history-card">
+                                <div class="history-title">🏆 Top Selling Items</div>
+                                <div class="history-stats">
+                        `;
+                        data.topItems.forEach(item => {
+                            html += `
+                                <div class="history-stat">
+                                    <div class="history-stat-number">${item.quantity}</div>
+                                    <div class="history-stat-label">${item.name}</div>
+                                </div>
+                            `;
+                        });
+                        html += '</div></div>';
+                    }
+
+                    resultsDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error fetching history data:', error);
+                    resultsDiv.innerHTML = '<div class="no-data">Error loading history data</div>';
+                });
+        }
+    </script>
+</body>
+</html> 

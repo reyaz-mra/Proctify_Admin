@@ -1,0 +1,639 @@
+﻿@model List<FoodMenu.POCOModels.Menuitem>
+@{
+    ViewBag.Title = "Manage Menu Items";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Menu Items</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FFFDF6;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: #FAF6E9;
+            border-right: 2px solid #DDEB9D;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo-section {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #DDEB9D;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 2em;
+            font-weight: 700;
+            color: #A0C878;
+            margin-bottom: 10px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #DDEB9D;
+            color: #333;
+            text-decoration: none;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: #A0C878;
+            color: white;
+            box-shadow: 0 4px 15px rgba(160, 200, 120, 0.3);
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 1.2em;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            background: #FFFDF6;
+        }
+
+        .page-header {
+            background: #FAF6E9;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #DDEB9D;
+        }
+
+        .page-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .page-subtitle {
+            color: #666;
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+
+        .content-section {
+            background: #FAF6E9;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: 2px solid #DDEB9D;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: "➕";
+            font-size: 1.2em;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #DDEB9D;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #DDEB9D;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #A0C878;
+            box-shadow: 0 0 0 3px rgba(160, 200, 120, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #A0C878;
+            color: white;
+            box-shadow: 0 4px 15px rgba(160, 200, 120, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(160, 200, 120, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        /* Table Container */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #DDEB9D;
+            background: white;
+        }
+
+        .menu-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .menu-items-table th {
+            background: #A0C878;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .menu-items-table td {
+            padding: 15px;
+            border-bottom: 1px solid #DDEB9D;
+        }
+
+        .menu-items-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .menu-items-table tr:hover {
+            background: #FAF6E9;
+        }
+
+        /* Column Widths */
+        .col-name { width: 25%; }
+        .col-price { width: 15%; }
+        .col-category { width: 20%; }
+        .col-status { width: 15%; }
+        .col-actions { width: 25%; }
+
+        .item-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .item-input {
+            flex: 1;
+            min-width: 120px;
+            padding: 8px 12px;
+            border: 2px solid #DDEB9D;
+            border-radius: 6px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .item-input:focus {
+            outline: none;
+            border-color: #A0C878;
+            box-shadow: 0 0 0 2px rgba(160, 200, 120, 0.1);
+        }
+
+        .name-input { min-width: 150px; }
+        .price-input { min-width: 80px; }
+        .category-input { min-width: 120px; }
+        .url-input { min-width: 200px; }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-input {
+            width: 18px;
+            height: 18px;
+            accent-color: #A0C878;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #DDEB9D;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #DDEB9D;
+            color: #155724;
+            border: 1px solid #A0C878;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state::before {
+            content: "🍕";
+            font-size: 3em;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .add-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .form-group {
+                min-width: auto;
+            }
+            
+            .menu-items-table {
+                font-size: 0.9em;
+            }
+            
+            .menu-items-table th,
+            .menu-items-table td {
+                padding: 10px;
+            }
+            
+            .item-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .item-input {
+                min-width: auto;
+            }
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #A0C878;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.2em;
+        }
+
+        @@media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo-section">
+                <div class="logo">🍽️ FoodMenu</div>
+                <div class="logo-subtitle">Restaurant Management</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="/Admin/Dashboard" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Orders" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        Live Orders
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Analytics" class="nav-link">
+                        <span class="nav-icon">📈</span>
+                        Sales Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Categories" class="nav-link">
+                        <span class="nav-icon">📂</span>
+                        Categories
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/MenuItems" class="nav-link active">
+                        <span class="nav-icon">🍕</span>
+                        Menu Items
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Tables" class="nav-link">
+                        <span class="nav-icon">🪑</span>
+                        Tables
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Settings" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">🍕 Manage Menu Items</h1>
+                <p class="page-subtitle">Add and manage menu items</p>
+            </div>
+
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Message"]
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="content-section">
+                <h2 class="section-title">Add New Menu Item</h2>
+                <form method="post" action="/Admin/AddMenuItem" class="add-form">
+                    <div class="form-group">
+                        <label for="itemName" class="form-label">Item Name</label>
+                        <input type="text" id="itemName" name="itemName" class="form-input" 
+                               placeholder="Enter item name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemPrice" class="form-label">Price (₹)</label>
+                        <input type="number" id="itemPrice" name="itemPrice" class="form-input" 
+                               placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemCategory" class="form-label">Category</label>
+                        <select id="itemCategory" name="itemCategory" class="form-input" required>
+                            <option value="">Select Category</option>
+                            @foreach (var category in ViewBag.Categories ?? new List<FoodMenu.POCOModels.Menucategory>())
+                            {
+                                <option value="@category.CategoryId">@category.CategoryName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemImageUrl" class="form-label">Image URL</label>
+                        <input type="url" id="itemImageUrl" name="itemImageUrl" class="form-input" 
+                               placeholder="https://example.com/image.jpg">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Menu Item</button>
+                </form>
+            </div>
+
+            <div class="content-section">
+                <h2 class="section-title">Existing Menu Items</h2>
+                @if (!Model.Any())
+                {
+                    <div class="empty-state">
+                        <div>No menu items found</div>
+                        <div style="font-size: 0.9em; margin-top: 10px; opacity: 0.7;">
+                            Add your first menu item above
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-container">
+                        <table class="menu-items-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-name">Item Name</th>
+                                    <th class="col-price">Price</th>
+                                    <th class="col-category">Category</th>
+                                    <th class="col-status">Status</th>
+                                    <th class="col-actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <form method="post" action="/Admin/UpdateMenuItem" class="item-form">
+                                                <input type="hidden" name="itemId" value="@item.MenuItemId" />
+                                                <input type="text" name="itemName" value="@item.Name" 
+                                                       class="item-input name-input" required>
+                                                <input type="number" name="itemPrice" value="@item.Price" 
+                                                       class="item-input price-input" step="0.01" min="0" required>
+                                                @{
+                                                    var categories = ViewBag.Categories as IEnumerable<FoodMenu.POCOModels.Menucategory>
+                                                    ?? Enumerable.Empty<FoodMenu.POCOModels.Menucategory>();
+                                                }
+                                                <select name="itemCategory" class="item-input category-input" required>
+                                                    @foreach (var cat in categories)
+                                                    {
+                                                        <option value="@cat.CategoryId" selected="@(cat.CategoryId == item.CategoryId ? "selected" : null)">
+                                                            @cat.CategoryName
+                                                        </option>
+                                                    }
+                                                </select>
+                                                <input type="url" name="itemImageUrl" value="@item.ImageUrl" 
+                                                       class="item-input url-input" placeholder="Image URL">
+                                                <div class="checkbox-wrapper">
+                                                    <input type="checkbox" name="isActive" value="true" 
+                                                           class="checkbox-input" @(item.IsActive == true ? "checked" : "") />
+                                                    <label style="font-size: 0.9em; color: #666;">Active</label>
+                                                </div>
+                                                <button type="submit" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.9em;">
+                                                    Update
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <span style="font-weight: 600; color: #A0C878;">₹@item.Price</span>
+                                        </td>
+                                        <td>
+                                            <span style="color: #666;">
+                                                @{
+                                                    var category = ViewBag.Categories as List<FoodMenu.POCOModels.Menucategory>;
+                                                    var categoryName = category?.FirstOrDefault(c => c.CategoryId == item.CategoryId)?.CategoryName ?? "Unknown";
+                                                }
+                                                @categoryName
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge @(item.IsActive == true ? "status-active" : "status-inactive")">
+                                                @(item.IsActive == true ? "Active" : "Inactive")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span style="color: #666; font-size: 0.9em;">
+                                                ID: @item.MenuItemId
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+    </script>
+</body>
+</html>

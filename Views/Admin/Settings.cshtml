@@ -1,0 +1,671 @@
+@{
+    ViewBag.Title = "Settings";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FFFDF6;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: #FAF6E9;
+            border-right: 2px solid #DDEB9D;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo-section {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #DDEB9D;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 2em;
+            font-weight: 700;
+            color: #A0C878;
+            margin-bottom: 10px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #DDEB9D;
+            color: #333;
+            text-decoration: none;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: #A0C878;
+            color: white;
+            box-shadow: 0 4px 15px rgba(160, 200, 120, 0.3);
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 1.2em;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            background: #FFFDF6;
+        }
+
+        .page-header {
+            background: #FAF6E9;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #DDEB9D;
+        }
+
+        .page-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .page-subtitle {
+            color: #666;
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .settings-card {
+            background: #FAF6E9;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #DDEB9D;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .card-icon {
+            font-size: 2em;
+            color: #A0C878;
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .setting-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #DDEB9D;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .setting-input:focus {
+            outline: none;
+            border-color: #A0C878;
+            box-shadow: 0 0 0 3px rgba(160, 200, 120, 0.1);
+        }
+
+        .setting-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #DDEB9D;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .setting-select:focus {
+            outline: none;
+            border-color: #A0C878;
+            box-shadow: 0 0 0 3px rgba(160, 200, 120, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            accent-color: #A0C878;
+        }
+
+        .checkbox-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #A0C878;
+            color: white;
+            box-shadow: 0 4px 15px rgba(160, 200, 120, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(160, 200, 120, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #DDEB9D;
+            color: #155724;
+            border: 1px solid #A0C878;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background: #28a745;
+        }
+
+        .status-offline {
+            background: #dc3545;
+        }
+
+        .backup-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #DDEB9D;
+        }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #DDEB9D;
+        }
+
+        .backup-item:last-child {
+            border-bottom: none;
+        }
+
+        .backup-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .backup-date {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #A0C878;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.2em;
+        }
+
+        @@media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo-section">
+                <div class="logo">🍽️ FoodMenu</div>
+                <div class="logo-subtitle">Restaurant Management</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="/Admin/Dashboard" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Orders" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        Live Orders
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Analytics" class="nav-link">
+                        <span class="nav-icon">📈</span>
+                        Sales Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Categories" class="nav-link">
+                        <span class="nav-icon">📂</span>
+                        Categories
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/MenuItems" class="nav-link">
+                        <span class="nav-icon">🍕</span>
+                        Menu Items
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Tables" class="nav-link">
+                        <span class="nav-icon">🪑</span>
+                        Tables
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Settings" class="nav-link active">
+                        <span class="nav-icon">⚙️</span>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">⚙️ Settings</h1>
+                <p class="page-subtitle">Configure system settings and preferences</p>
+            </div>
+
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Message"]
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="settings-grid">
+                <!-- Restaurant Information -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-icon">🏪</div>
+                        <div class="card-title">Restaurant Information</div>
+                    </div>
+                    
+                    <form method="post" action="/Admin/UpdateRestaurantInfo">
+                        <div class="setting-group">
+                            <label for="restaurantName" class="setting-label">Restaurant Name</label>
+                            <input type="text" id="restaurantName" name="restaurantName" class="setting-input" 
+                                   value="FoodMenu Restaurant" placeholder="Enter restaurant name">
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="restaurantAddress" class="setting-label">Address</label>
+                            <input type="text" id="restaurantAddress" name="restaurantAddress" class="setting-input" 
+                                   value="123 Main Street, City, State 12345" placeholder="Enter address">
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="restaurantPhone" class="setting-label">Phone Number</label>
+                            <input type="tel" id="restaurantPhone" name="restaurantPhone" class="setting-input" 
+                                   value="+1 (555) 123-4567" placeholder="Enter phone number">
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="restaurantEmail" class="setting-label">Email</label>
+                            <input type="email" id="restaurantEmail" name="restaurantEmail" class="setting-input" 
+                                   value="info@foodmenu.com" placeholder="Enter email">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Save Restaurant Info</button>
+                    </form>
+                </div>
+
+                <!-- System Settings -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-icon">⚙️</div>
+                        <div class="card-title">System Settings</div>
+                    </div>
+                    
+                    <form method="post" action="/Admin/UpdateSystemSettings">
+                        <div class="setting-group">
+                            <label for="currency" class="setting-label">Currency</label>
+                            <select id="currency" name="currency" class="setting-select">
+                                <option value="INR" selected>Indian Rupee (₹)</option>
+                                <option value="USD">US Dollar ($)</option>
+                                <option value="EUR">Euro (€)</option>
+                                <option value="GBP">British Pound (£)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="timezone" class="setting-label">Timezone</label>
+                            <select id="timezone" name="timezone" class="setting-select">
+                                <option value="Asia/Kolkata" selected>Asia/Kolkata (IST)</option>
+                                <option value="UTC">UTC</option>
+                                <option value="America/New_York">America/New_York (EST)</option>
+                                <option value="Europe/London">Europe/London (GMT)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="language" class="setting-label">Language</label>
+                            <select id="language" name="language" class="setting-select">
+                                <option value="en" selected>English</option>
+                                <option value="hi">Hindi</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                            </select>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="notifications" name="notifications" class="checkbox-input" checked>
+                            <label for="notifications" class="checkbox-label">Enable Notifications</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="autoBackup" name="autoBackup" class="checkbox-input" checked>
+                            <label for="autoBackup" class="checkbox-label">Auto Backup</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="maintenanceMode" name="maintenanceMode" class="checkbox-input">
+                            <label for="maintenanceMode" class="checkbox-label">Maintenance Mode</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Save System Settings</button>
+                    </form>
+                </div>
+
+                <!-- Database & Backup -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-icon">💾</div>
+                        <div class="card-title">Database & Backup</div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Database Status</label>
+                        <div style="display: flex; align-items: center; margin-top: 5px;">
+                            <span class="status-indicator status-online"></span>
+                            <span>Online</span>
+                        </div>
+                        <div class="info-text">Last backup: 2 hours ago</div>
+                    </div>
+                    
+                    <div class="backup-info">
+                        <div class="backup-item">
+                            <span class="backup-name">Daily Backup</span>
+                            <span class="backup-date">Today 2:00 AM</span>
+                        </div>
+                        <div class="backup-item">
+                            <span class="backup-name">Weekly Backup</span>
+                            <span class="backup-date">Sunday 3:00 AM</span>
+                        </div>
+                        <div class="backup-item">
+                            <span class="backup-name">Monthly Backup</span>
+                            <span class="backup-date">1st of month</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="createBackup()">Create Backup</button>
+                        <button class="btn btn-primary" onclick="restoreBackup()">Restore Backup</button>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-icon">🔒</div>
+                        <div class="card-title">Security</div>
+                    </div>
+                    
+                    <form method="post" action="/Admin/UpdateSecuritySettings">
+                        <div class="setting-group">
+                            <label for="sessionTimeout" class="setting-label">Session Timeout (minutes)</label>
+                            <input type="number" id="sessionTimeout" name="sessionTimeout" class="setting-input" 
+                                   value="30" min="5" max="480">
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="maxLoginAttempts" class="setting-label">Max Login Attempts</label>
+                            <input type="number" id="maxLoginAttempts" name="maxLoginAttempts" class="setting-input" 
+                                   value="5" min="3" max="10">
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="twoFactorAuth" name="twoFactorAuth" class="checkbox-input">
+                            <label for="twoFactorAuth" class="checkbox-label">Enable Two-Factor Authentication</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="passwordExpiry" name="passwordExpiry" class="checkbox-input" checked>
+                            <label for="passwordExpiry" class="checkbox-label">Password Expiry (90 days)</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Save Security Settings</button>
+                    </form>
+                    
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="changePassword()">Change Password</button>
+                        <button class="btn btn-danger" onclick="resetSystem()">Reset System</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // Create backup function
+        function createBackup() {
+            if (confirm('Are you sure you want to create a backup?')) {
+                alert('Backup created successfully!');
+            }
+        }
+
+        // Restore backup function
+        function restoreBackup() {
+            if (confirm('Are you sure you want to restore from backup? This will overwrite current data.')) {
+                alert('Backup restored successfully!');
+            }
+        }
+
+        // Change password function
+        function changePassword() {
+            const newPassword = prompt('Enter new password:');
+            if (newPassword) {
+                alert('Password changed successfully!');
+            }
+        }
+
+        // Reset system function
+        function resetSystem() {
+            if (confirm('Are you sure you want to reset the system? This will delete all data and cannot be undone.')) {
+                if (confirm('This action cannot be undone. Are you absolutely sure?')) {
+                    alert('System reset initiated. Please wait...');
+                }
+            }
+        }
+    </script>
+</body>
+</html> 
